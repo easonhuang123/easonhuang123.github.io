@@ -1,1 +1,119 @@
-hello bro
+<!DOCTYPE HTML>
+<html>
+    <body>
+        <div id='test' :title="tips">
+            {{message}}
+            <!-- 处理函数 -->
+            <button id="btn" @click="change">click</button>    
+            <!-- 循环 -->
+            <ol id="test2">                     
+                <li v-for="todo in todos">
+                    {{todo.text}}
+                </li>
+            </ol>
+            <!-- 组件化 -->
+            <ul>         
+                <!--使用DOM 模版解析  -->
+                <todo-item v-for="item in list" :todo="item" :key="item.id"></todo-item>
+            </ul>
+            <!--管道过滤  -->
+            <p>{{message|filter}}</p>
+            <!--计算属性  -->
+            <p>{{computed}}</p>
+            <!--v-for 对象迭代 遍历结果想不懂？？？-->
+            <ul>
+                <li v-for="(item,key,index) in items">{{index}}{{key}}{{item}}</li>
+            </ul>
+            <!--组件与v-for  -->
+            <input v-model="newTodoText" @keyup.enter="addNewTodo" placeholder="Add a todo">
+            <ul >
+                <!--有必要的话请使用字符串模版 is="xxx"  -->
+                <li is="todo" v-for="(todo,index) in todos2" :key="index" :title="todo" @remove="todos2.splice(index,1)"></li>
+            </ul>
+            <!--绑定事件  v-model 指令在表单控件元素上创建双向数据绑定 -->
+            <input type="checkbox" id="jack" value="Jack" v-model="checkedNames">
+            <label for="jack">Jack</label>
+            <input type="checkbox" id="john" value="John" v-model="checkedNames">
+            <label for="john">John</label>
+            <input type="checkbox" id="mike" value="Mike" v-model="checkedNames">
+            <label for="mike">Mike</label>
+            <br>
+            <span>Checked names: {{ checkedNames }}</span>
+         </div>
+    </body>
+    <script src="https://unpkg.com/vue"></script>
+    <script>
+        //全局注册组件1
+        Vue.component('todo-item',{
+            props:['todo'],
+            template:'<li>{{todo.text}}</li>'
+        })
+        var todo={
+            props:['title'],
+            template:'<li>{{title}}<button @click="$emit(\'remove\')">X</button></li>'
+        }
+        // 要确保在初始化根实例之前注册了组件
+        var test=new Vue({
+            el:"#test",
+            data:{
+                message:'hey guys!',
+                tips:'heiheihei~',
+                todos:[
+                    {text:"1"},
+                    {text:"2"},
+                    {text:"3"}
+                ],
+                list:[
+                    {id:1,text:'111'},
+                    {id:2,text:'222'},
+                    {id:3,text:'333'}
+                ],
+                items:{
+                    one:'11',
+                    two:'22',
+                    three:'333'
+                },
+                todos2:[
+                    '123',
+                    '234',
+                    '345'
+                ],
+                newTodoText:'',
+                checkedNames: []
+            },
+            methods:{
+                change:function(){                //文字倒叙按钮
+                    this.message=this.message.split('').reverse().join('')
+                },
+                addNewTodo:function(){           //TODO list新增回车函数
+                    this.todos2.push(this.newTodoText);
+                    this.newTodoText='';
+                }
+            },
+            created:function(){          //生命周期钩子
+                console.log('created!')
+            },
+            filters:{
+                filter:function(value){ //value是第一个值，message
+                    return value+'1';
+                }
+            },
+            computed:{
+                computed:{
+                    get:function(){                  //默认有个getter
+                        return this.message+'2';
+                    },
+                    set:function(newValue){         //我们可以给他一个setter
+                        this.message=newValue;
+                    }
+                }
+            },
+            //通过使用组件实例选项注册，可以使组件仅在另一个实例/组件的作用域中可用
+            components:{
+                'todo':todo
+            }
+        })
+
+        test.message='bey guys!'
+    </script>
+</html>
